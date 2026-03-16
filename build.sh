@@ -5,7 +5,7 @@ case $get_arch in
     "x86_64")
         echo "x86_64"
         ;;
-    "arm64")
+    "aarch64")
         echo "arm64"
         ;;
     *)
@@ -14,7 +14,7 @@ case $get_arch in
 esac
 mkdir -p build
 cd build
-if [ $get_arch == "arm64" ]; then
+if [ $get_arch == "aarch64" ]; then
     cmake -DIS_ARM=ON ..
 else
     cmake ..
