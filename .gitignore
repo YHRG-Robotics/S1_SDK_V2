@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+build/
+develop-eggs/
+dist/
+examples/C++/*
+downloads/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+*.csv
+# *.so
+# IDE
+.vscode/
+
+# Other
+.DS_Store
+Thumbs.db
