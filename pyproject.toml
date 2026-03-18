@@ -13,7 +13,6 @@ requires-python = ">=3.8"
 dependencies = [
     "numpy",
     "mujoco==3.4.0",
-    "sympy",
     "pynput"
 ]
 [tool.setuptools.packages.find]
