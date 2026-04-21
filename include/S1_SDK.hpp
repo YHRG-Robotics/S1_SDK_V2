@@ -25,7 +25,6 @@ public:
     uint8_t Control_Foc(std::vector<float>& tau);
     void Control_Teach(float tau);
     void  Control_Gripper(float pos, float tau);
-    uint8_t Control_MIT(std::vector<float>& pos, std::vector<float>& vel, std::vector<float>& kp, std::vector<float>& kd,std::vector<float>& tau);
     void Set_Zero_Position();
     void Set_End_Zero_Position();
 
