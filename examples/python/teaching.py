@@ -14,10 +14,13 @@ import argparse
 
 output_path = os.path.dirname(os.path.abspath(__file__))
 header_written = False
+def str2bool(v):
+    return v.lower() not in ('false', '0', 'no', 'off')
+
 parser = argparse.ArgumentParser(description="S1 机械臂记录轨迹脚本")
 parser.add_argument("--dev", type=str, default="COM23", help="串口设备，例如 COM23 或 /dev/ttyUSB0")
 parser.add_argument("--end", type=str, default="None", help="末端执行器类型，例如 'gripper', 'None' ,'teach'")
-parser.add_argument("--record", type=bool, default=True, help="是否记录轨迹，默认True")
+parser.add_argument("--record", type=str2bool, default=True, help="是否记录轨迹，默认True")
 args = parser.parse_args()
 def load_csv_data(file_path):
     """读取记录的CSV文件，返回位置数据列表"""
