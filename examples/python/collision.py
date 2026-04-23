@@ -1,6 +1,6 @@
 import time
-import argparse
 from S1_SDK import S1_arm, control_mode
+from common import create_parser
 
 """
 本代码为测试机械臂自碰撞检测功能。
@@ -9,17 +9,8 @@ from S1_SDK import S1_arm, control_mode
 当机械臂与自身发生碰撞时，终端会打印警告信息。
 """
 
-# 映射字符串到 control_mode 枚举
-MODE_MAP = {
-    "only_real": control_mode.only_real,
-    "only_sim": control_mode.only_sim,
-}
-
 def main():
-    parser = argparse.ArgumentParser(description="S1 机械臂自碰撞检测测试脚本")
-    parser.add_argument("--dev", type=str, default="COM23", help="串口设备，例如 COM23 或 /dev/ttyUSB0")
-    parser.add_argument("--end", type=str, default="None", help="末端执行器类型，例如 'gripper', 'None' 等")
-
+    parser = create_parser("S1 机械臂自碰撞检测测试脚本", include_mode=False)
     args = parser.parse_args()
 
     # 创建机械臂实例

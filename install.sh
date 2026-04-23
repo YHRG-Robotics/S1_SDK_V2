@@ -1,4 +1,6 @@
+
 #!/bin/bash
+# pip install -e .
 set -e
 
 get_arch=$(uname -m)
@@ -29,4 +31,3 @@ fi
 make -j$(nproc)
 
 cd ..
-pip install -e .

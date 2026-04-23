@@ -3,7 +3,7 @@ import math
 from pynput import keyboard
 from S1_SDK import S1_arm,control_mode
 import time
-import argparse
+from common import create_parser, MODE_MAP
 """
 本代码为机械臂笛卡尔空间控制，使用键盘控制末端
 注意:
@@ -23,10 +23,6 @@ now_joint = 0
 # arm.enable()
 current_pos = [0.0] * 6
 delta = 0.005  # 每次调整 1 度（转为弧度）
-MODE_MAP = {
-    "only_real": control_mode.only_real,
-    "only_sim": control_mode.only_sim,
-}
 def on_press(key):
     global now_joint
     try:
@@ -59,12 +55,7 @@ listener = keyboard.Listener(on_press=on_press, on_release=on_release)
 listener.start()
 def main():
     try:
-        parser = argparse.ArgumentParser(description="S1 机械臂关节角度控制脚本")
-        parser.add_argument("--dev", type=str, default="COM23", help="串口设备，例如 COM23 或 /dev/ttyUSB0")
-        parser.add_argument("--mode", type=str, choices=["only_real", "only_sim"],
-                            default="only_real", help="控制模式：only_real（默认）, sim_and_real, only_sim")
-        parser.add_argument("--end", type=str, default="None", help="末端执行器类型，例如 'gripper', 'None' ,'teach'")
-
+        parser = create_parser("S1 机械臂关节角度控制脚本")
         args = parser.parse_args()
         arm = S1_arm(
             mode=MODE_MAP[args.mode],

@@ -1,7 +1,7 @@
 import time
 import math
 from S1_SDK import S1_arm,control_mode
-import argparse
+from common import create_parser, MODE_MAP
 """
 本代码为测试机械臂读取当前位置功能，机械臂不使能，调用get_pos接口
 此时机械臂不会运动，终端会打印当前位置，采用弧度制
@@ -10,17 +10,8 @@ import argparse
 # 初始化机械臂
 # windows下使用COM+number ，linux下使用/dev/ttyUSB+number
 # 例子：如windows--COM20，linux-----/dev/ttyUSB0
-MODE_MAP = {
-    "only_real": control_mode.only_real,
-    "only_sim": control_mode.only_sim,
-}
 def main():
-    parser = argparse.ArgumentParser(description="S1 机械臂读角度测试脚本")
-    parser.add_argument("--dev", type=str, default="COM23", help="串口设备，例如 COM23 或 /dev/ttyUSB0")
-    parser.add_argument("--mode", type=str, choices=["only_real", "only_sim"],
-                        default="only_real", help="控制模式：only_real（默认）, sim_and_real, only_sim")
-    parser.add_argument("--end", type=str, default="None", help="末端执行器类型，例如 'gripper', 'None' ,'teach'")
-
+    parser = create_parser("S1 机械臂读角度测试脚本")
     args = parser.parse_args()
     arm = S1_arm(
         mode=MODE_MAP[args.mode],

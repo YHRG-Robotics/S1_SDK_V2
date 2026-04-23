@@ -2,7 +2,7 @@ import time
 
 # 添加项目根目录到 Python 路径
 from S1_SDK import S1_arm,control_mode
-import argparse
+from common import create_parser
 
 """
 本代码为机械臂重力补偿功能,调用gravity接口
@@ -22,10 +22,7 @@ import argparse
 
 def main():
     try:
-        parser = argparse.ArgumentParser(description="S1 机械臂重力补偿脚本")
-        parser.add_argument("--dev", type=str, default="COM23", help="串口设备，例如 COM23 或 /dev/ttyUSB0")
-        parser.add_argument("--end", type=str, default="None", help="末端执行器类型，例如 'gripper', 'None' ,'teach'")
-
+        parser = create_parser("S1 机械臂重力补偿脚本", include_mode=False)
         args = parser.parse_args()
         print(f"使用串口: {args.dev}, 末端执行器: {args.end}")
         arm = S1_arm(
@@ -36,7 +33,6 @@ def main():
         arm.enable()
         # 重力补偿
         while True:
-            # print(f"pos: {[f'{p:.3f}' for p in pos]}")
             arm.gravity()
             time.sleep(0.005)   
     except KeyboardInterrupt:

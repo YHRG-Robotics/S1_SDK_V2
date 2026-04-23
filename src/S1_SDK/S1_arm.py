@@ -21,6 +21,7 @@ END_TYPE : Dict[str,EndType] = {
     "None":EndType.none,
     "gripper":EndType.gripper,
     "teach":EndType.teach,
+    "mix":EndType.mix,
 }
 # from smotor_master import SmotorMaster
 ##控制模式枚举
@@ -34,7 +35,7 @@ STRATEGY_MAP: Dict[control_mode, arm_mode.ControlStrategy] = {
     control_mode.only_real: arm_mode.OnlyRealStrategy(),
     control_mode.real_control_sim: arm_mode.RealControlSimStrategy(),
 }
-end_checker = ["None","gripper","teach"]
+end_checker = ["None","gripper","teach","mix"]
 range_checker = [[math.radians(-170),math.radians(170)],
                   [math.radians(0),math.radians(180)],
                   [math.radians(0),math.radians(170)],
@@ -74,8 +75,7 @@ class S1_arm:
             self.collision_checker = None
         self.__init_arm(dev,mode,arm_version)
         if self.strategy.needs_motor():
-            # self.motors = len(self.motor.motors)
-            pass
+            self.motors = 7
         else:
             self.motors = 7
         
@@ -86,7 +86,9 @@ class S1_arm:
         MIT关节控制,控制六个关节
         :param pos: 六个关节的位置,列表形式,每个元素为一个关节的位置
         """
-        if len(pos) > 6 or pos is None:
+        if pos is None:
+            return False
+        if len(pos) > 6 :
             return False
         for i in range(len(pos)):
             pos[i] = clamp(pos[i],range_checker[i])
@@ -132,6 +134,14 @@ class S1_arm:
             self.motor.control_teach(tau)
         else:
             self.motor.control_teach(0)
+    def control_teach_zero_tau(self):
+        self.motor.control_teach(0)
+    def control_teach_pos(self,pos):    
+        self.motor.control_teach_pos(-pos)
+    def control_mix(self,pos):
+        self.motor.control_mix_gripper(pos,0,5.0,0,0)
+    def control_mix_zero_tau(self):
+        self.motor.control_mix_gripper(0,0,0,0,0)
     def enable(self):
         """
         使能电机
@@ -202,7 +212,7 @@ class S1_arm:
         if self.strategy.needs_motor():
             return self.motor.get_velocity()
         else:
-            return [0.0]*len(self.motor_list)
+            return [0.0]*self.motors
     def get_tau(self):
         """
         获取当前关节力矩
@@ -220,7 +230,7 @@ class S1_arm:
         if self.strategy.needs_motor():
             return self.motor.get_coil_temperature()
         else:
-            return [0.0]*len(self.motor_list)
+            return [0.0]*self.motors
     #####状态块END###
         
     def close(self):
@@ -228,7 +238,6 @@ class S1_arm:
         关闭电机
         """
         if self.strategy.needs_motor():
-            # self.motor.close()
             self.disable()
     def __init_arm(self,dev,mode,arm_version):
         self.strategy = STRATEGY_MAP.get(mode)
@@ -239,10 +248,14 @@ class S1_arm:
         if self.strategy.needs_sim():
             script_dir = os.path.dirname(os.path.abspath(__file__))
             if self.end_effector == "None":
-                self.sim = Mujoco(os.path.join(script_dir,'resource/meshes/gripper_less.xml'))
-            elif self.end_effector == "gripper" or self.end_effector == "teach":
-                self.sim = Mujoco(os.path.join(script_dir,'resource/meshes/gripper.xml'))
-class S1_slover():
+                self.sim = Mujoco(os.path.join(script_dir,'resource/gripper_less.xml'))
+            elif self.end_effector == "gripper":
+                self.sim = Mujoco(os.path.join(script_dir,'resource/gripper.xml'))
+            elif self.end_effector == "teach":
+                self.sim = Mujoco(os.path.join(script_dir,'resource/teach.xml'))
+            elif self.end_effector == "mix":
+                self.sim = Mujoco(os.path.join(script_dir,'resource/mix.xml'))
+class S1_solver():
     def __init__(self, end_offset:List[float]) -> None:
         self.solver = S1_Kinematics(end_offset)
     def forward_quat(self, qpos:List[float]):
@@ -252,31 +265,36 @@ class S1_slover():
         :return: 末端执行器位置列表,每个元素为一个坐标或完整位姿 [x,y,z,qx,qy,qz,qw]
         """
         return self.solver.fk_quat(qpos)
-    def inverse_quat(self, pos:List[float],qpos:List[float]):
+    def inverse_quat(self, pos:List[float], qpos:List[float]=None):
         """
         逆解: 给定末端执行器位置,返回关节角度
         :param pos: 末端执行器位置列表,每个元素为一个坐标或完整位姿 [x,y,z,qx,qy,qz,qw]
+        :param qpos: 初始关节角度猜测,默认为零位
         :return: 关节角度列表,长度为6
         """
-        ret = self.solver.ik_quat(pos,qpos)
+        if qpos is None:
+            qpos = [0.0]*6
+        ret = self.solver.ik_quat(pos, qpos)
         if ret == []:
             print("逆解失败")
             return None
         return ret
-    def forward_eular(self, qpos:List[float]):
+    def forward_euler(self, qpos:List[float]):
         """
         正解: 给定关节角度,返回末端执行器位置
         :param qpos: 关节角度列表,长度为6
         :return: 末端执行器位置列表,每个元素为一个坐标或完整位姿 [x,y,z,rx,ry,rz]
         """
         return self.solver.fk_euler(qpos)
-    def inverse_eular(self, pos:List[float],qpos:List[float]):
+    def inverse_euler(self, pos:List[float], qpos:List[float]=None):
         """
         逆解: 给定末端执行器位置,返回关节角度
         :param pos: 末端执行器位置列表,每个元素为一个坐标或完整位姿 [x,y,z,rx,ry,rz]
         :return: 关节角度列表,长度为6
         """
-        ret = self.solver.ik_euler(pos,qpos)
+        if qpos is None:
+            qpos = [0.0]*6
+        ret = self.solver.ik_euler(pos, qpos)
         if ret == []:
             print("逆解失败")
             return None

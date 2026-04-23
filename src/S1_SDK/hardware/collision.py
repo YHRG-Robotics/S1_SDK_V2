@@ -45,11 +45,11 @@ class CollisionChecker:
         根据 gripper 参数加载对应模型
         """
         if gripper:
-            xml_path = os.path.join(self.script_dir, "../resource/meshes/gripper.xml")
+            xml_path = os.path.join(self.script_dir, "../resource/gripper.xml")
         else:
             xml_path = os.path.join(
                 os.path.dirname(__file__),  # 当前文件目录：S1_SDK/hardware/
-                "../resource/meshes/gripper_less.xml"  # 正确相对路径
+                "../resource/gripper_less.xml"  # 正确相对路径
             )
 
         if not os.path.exists(xml_path):
@@ -123,7 +123,7 @@ class CollisionChecker:
                 continue
             elif geom1_name == "geom0" or geom2_name == "geom10":
                 continue
-            print(geom1_name, geom2_name)
+            # print(geom1_name, geom2_name)
             body1_name = self.model.body(self.model.geom_bodyid[contact.geom1]).name
             body2_name = self.model.body(self.model.geom_bodyid[contact.geom2]).name
             pair_geom = tuple(sorted([geom1_name, geom2_name]))

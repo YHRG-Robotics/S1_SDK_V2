@@ -13,6 +13,7 @@ PYBIND11_MODULE(motor_interface, m) {
         .value("gripper", S1::EndEffectorType::Gripper)
         .value("teach", S1::EndEffectorType::Teach)
         .value("none", S1::EndEffectorType::None)
+        .value("mix", S1::EndEffectorType::Mix)
         .export_values();
     py::class_<S1::S1ARM>(m, "S1ARM")
         .def(py::init<std::string,S1::CommType,S1::EndEffectorType>())           // 构造函数
@@ -27,7 +28,9 @@ PYBIND11_MODULE(motor_interface, m) {
         .def("get_coil_temperature", &S1::S1ARM::Get_Coil_Temperature)
         .def("get_mos_temperature", &S1::S1ARM::Get_Mos_Temperature)
         .def("control_teach", &S1::S1ARM::Control_Teach)
+        .def("control_teach_pos", &S1::S1ARM::Control_Teach_Pos)
         .def("control_gripper", &S1::S1ARM::Control_Gripper)
+        .def("control_mix_gripper", &S1::S1ARM::Control_Mix_Gripper)
         .def("set_zero_position", &S1::S1ARM::Set_Zero_Position)
         .def("set_end_zero_position", &S1::S1ARM::Set_End_Zero_Position)
         .def("gravity", &S1::S1ARM::Gravity);

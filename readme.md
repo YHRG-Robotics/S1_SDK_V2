@@ -69,32 +69,22 @@ sudo apt update
 sudo apt install cmake build-essential
 ```
 
-### 2. 安装 pybind11
-
-```bash
-# conda 安装 (推荐)
-conda install -y -c conda-forge pybind11
-
-# 或 pip 安装
-pip install pybind11
-```
-
-### 3. 创建虚拟环境
+### 2. 创建虚拟环境
 
 ```bash
 conda create -y -n S1 python=3.10
 conda activate S1
 ```
 
-### 4. 克隆并安装
+### 3. 克隆并安装
 
 ```bash
 git clone https://github.com/YHRG-Robotics/S1_SDK_V2.git
 cd S1_SDK_V2
-./build.sh
+./install.sh
 ```
 
-### 5. 串口权限配置 (Linux)
+### 4. 串口权限配置 (Linux)
 
 ```bash
 sudo chmod 777 /dev/ttyUSB0
@@ -158,7 +148,7 @@ python disable.py --dev /dev/ttyUSB0
 使用键盘控制 6 个关节角度：
 
 ```bash
-python keyborad_joint.py --dev /dev/ttyUSB0 --mode only_real --end None
+python keyboard_joint.py --dev /dev/ttyUSB0 --mode only_real --end None
 ```
 
 **操作说明**：
@@ -202,8 +192,8 @@ python enable.py --dev /dev/ttyUSB0    # 使能
 python disable.py --dev /dev/ttyUSB0   # 失能
 
 # 运动控制
-python keyborad_joint.py --dev /dev/ttyUSB0      # 键盘控制关节
-python keyborad_end_effect.py --dev /dev/ttyUSB0 # 键盘控制末端
+python keyboard_joint.py --dev /dev/ttyUSB0      # 键盘控制关节
+python keyboard_end_effect.py --dev /dev/ttyUSB0 # 键盘控制末端
 python gravity.py --dev /dev/ttyUSB0             # 重力补偿
 
 # 高级功能
@@ -277,7 +267,7 @@ SDK同时提供C++接口，编译后生成可执行文件，位于 `examples/C++
 开启重力补偿，Ctrl+C退出：
 
 ```bash
-./graivty /dev/ttyUSB0
+./gravity /dev/ttyUSB0
 ```
 
 #### 6. 设置零位
@@ -309,6 +299,8 @@ arm.Control_Pos(pos, tau);             // 位置力矩控制
 arm.Control_Foc(tau);                  // 纯力矩控制
 arm.Control_Gripper(pos, tau);         // 夹爪控制
 arm.Control_Teach(tau);                // 示教控制
+arm.Control_Mix(pos);            // 控制复合式夹爪
+
 
 // 状态读取
 std::vector<float> pos = arm.Get_Position();
@@ -350,6 +342,7 @@ S1::CommType::Uart  // UART (S1 V2)
 S1::EndEffectorType::None
 S1::EndEffectorType::Gripper
 S1::EndEffectorType::Teach
+S1::EndEffectorType::Mix
 ```
 
 #### 辅助函数
@@ -392,6 +385,7 @@ S1_arm(
 | `"None"` | 无末端执行器 |
 | `"gripper"` | 夹爪 |
 | `"teach"` | 示教器 |
+| `"mix"` | 复合式夹爪 |
 
 ---
 
@@ -447,6 +441,7 @@ SDK会自动对超出范围的角度进行裁剪。
 ```python
 # 夹爪控制
 arm.control_gripper(pos=1.0, force=0.5)
+arm.control_mix(pos = 0.5)
 # pos: 位置范围 0~2.0
 # force: 力矩限制
 ```
@@ -454,20 +449,13 @@ arm.control_gripper(pos=1.0, force=0.5)
 ---
 
 ### 运动学求解
-
-#### 坐标系说明
-
-运动学坐标系以基座为原点，X轴正向朝前，Y轴正向朝左，Z轴正向朝上。
-
-![坐标系](images/image-1.png)
-
 #### 求解器使用
 
 ```python
-from S1_SDK import S1_slover
+from S1_SDK import S1_solver
 
 # 初始化求解器，传入末端偏移量（单位：米）
-solver = S1_slover([0.0, 0.0, 0.0])
+solver = S1_solver([0.0, 0.0, 0.0])
 
 # 正向运动学：关节角度 -> 末端位姿
 joint_angles = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -476,13 +464,13 @@ joint_angles = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 pose_quat = solver.forward_quat(joint_angles)
 
 # 欧拉角格式 [x, y, z, rx, ry, rz]
-pose_euler = solver.forward_eular(joint_angles)
+pose_euler = solver.forward_euler(joint_angles)
 
 # 逆向运动学：末端位姿 -> 关节角度
 target = [0.2, 0.0, 0.3, 0.0, 0.0, 0.0, 1.0]
 joints = solver.inverse_quat(target)
 # 或
-joints = solver.inverse_eular([0.2, 0.0, 0.3, 0.0, 0.0, 0.0])
+joints = solver.inverse_euler([0.2, 0.0, 0.3, 0.0, 0.0, 0.0])
 
 if joints:
     arm.joint_control(joints)
@@ -585,11 +573,10 @@ arm.disable()
 ### 示例2：笛卡尔空间运动
 
 ```python
-from S1_SDK import S1_arm, S1_slover, control_mode
-import math
+from S1_SDK import S1_arm, S1_solver, control_mode
 
 arm = S1_arm(control_mode.only_real, dev="/dev/ttyUSB0")
-solver = S1_slover([0.0, 0.0, 0.0])
+solver = S1_solver([0.0, 0.0, 0.0])
 
 arm.enable()
 
@@ -668,14 +655,14 @@ arm.disable()
 | `check_collision` | qpos: List[float] | bool | 碰撞检测 |
 | `close` | - | - | 关闭连接 |
 
-### S1_slover 类
+### S1_solver 类
 
 | 方法 | 参数 | 返回值 | 说明 |
 |------|------|--------|------|
 | `forward_quat` | qpos: List[float] | List[float] | 正解（四元数） |
 | `inverse_quat` | pos: List[float] | List[float] \| None | 逆解（四元数） |
-| `forward_eular` | qpos: List[float] | List[float] | 正解（欧拉角） |
-| `inverse_eular` | pos: List[float] | List[float] \| None | 逆解（欧拉角） |
+| `forward_euler` | qpos: List[float] | List[float] | 正解（欧拉角） |
+| `inverse_euler` | pos: List[float] | List[float] \| None | 逆解（欧拉角） |
 
 ### 辅助函数
 

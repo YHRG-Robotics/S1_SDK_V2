@@ -9,14 +9,20 @@ description = "SDK for Theseus S1  arm"
 authors = [{name = "theseus", email = "temp@temp.com"}]
 readme = "README.md"
 license = {text = "MIT"}
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
     "numpy",
     "mujoco==3.4.0",
-    "pynput"
+    "pynput",
+    "pybind11>=3.0.4",
 ]
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["S1_SDK"]
 [tool.setuptools.package-data]
 "S1_SDK" = ["**/*"]
+
+[tool.uv.workspace]
+members = [
+    "my-project",
+]

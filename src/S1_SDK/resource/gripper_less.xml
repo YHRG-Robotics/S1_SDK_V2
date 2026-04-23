@@ -1,0 +1,60 @@
+<mujoco model="S1_robot">
+<compiler angle="radian" meshdir="meshes" /> 
+  <asset>
+    <mesh name="base_link" file="base_link.STL"/>
+    <mesh name="1_Link" file="1_Link.STL"/>
+    <mesh name="2_Link" file="2_Link.STL"/>
+    <mesh name="3_Link" file="3_Link.STL"/>
+    <mesh name="4_Link" file="4_Link.STL"/>
+    <mesh name="5_Link" file="5_Link.STL"/>
+    <mesh name="6_Link" file="6_Link.STL"/>
+    <mesh name="9_1_Link" file="9_1_Link.STL"/>
+    <mesh name="9_2_Link" file="9_2_Link.STL"/>
+  </asset>
+  <worldbody>
+    <body name="base_link" pos="0 0 0">
+      <geom type="mesh" rgba="1 1 1 1" mesh="base_link"/>
+      <body name="1_Link" >
+        <inertial pos="0 -5e-06 0.0590654" quat="0.707107 0.707107 0 0" mass="0.240435" diaginertia="0.000186308 0.000164031 0.000128092"/>
+        <joint name="1joint" pos="0 0 0" axis="0 0 1" range="-2.967 2.967" actuatorfrcrange="-9 9"/>
+        <geom type="mesh" rgba="1 1 1 1" mesh="1_Link"/>
+        <body name="2_Link" pos="0 0 0.06525">
+          <inertial pos="-0.251879 0.000517957 -7.29157e-05" quat="0.000789709 0.712914 0.000571266 0.701251" mass="0.27896" diaginertia="0.00101012 0.000968578 0.00016357"/>
+          <joint name="2joint" pos="0 0 0" axis="0 1 0" range="0 3.14" actuatorfrcrange="-9 9"/>
+          <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="2_Link"/>
+          <body name="3_Link" pos="-0.3 0.000495 0">
+            <inertial pos="0.190378 -0.00362159 0.0563752" quat="0.532483 0.48923 0.485557 0.491274" mass="0.196496" diaginertia="0.000365387 0.000357218 7.49679e-05"/>
+            <joint name="3joint" pos="0 0 0" axis="0 -1 0" range="-3.4 0" actuatorfrcrange="-9 9"/>
+            <geom type="mesh" rgba="0.796078 0.823529 0.937255 1" mesh="3_Link"/>
+            <body name="4_Link" pos="0.22 -0.000495 0.057">
+              <inertial pos="0.0683945 0.00252083 0.0485252" quat="0.748495 0.318631 0.279259 0.510141" mass="0.160912" diaginertia="0.000225826 0.000223253 6.28301e-05"/>
+              <joint name="4joint" pos="0 0 0" axis="0 1 0" range="-1.57 1.518" actuatorfrcrange="-3 3"/>
+              <geom type="mesh" rgba="1 1 1 1" mesh="4_Link"/>
+              <body name="5_Link" pos="0.0807873 0 0.0591737">
+                <inertial pos="0.000956924 -9.47221e-11 -0.0552063" quat="0.998968 -2.28286e-07 -0.0454145 5.02154e-06" mass="0.148471" diaginertia="7.23521e-05 7.08257e-05 6.2135e-05"/>
+                <joint name="5joint" pos="0 0 0" axis="0 0 -1" range="-1.57 1.57" actuatorfrcrange="-3 3"/>
+                <geom type="mesh" rgba="1 1 1 1" mesh="5_Link"/>
+                <body name="6_Link" pos="0.0012127 0 -0.059174">
+                  <inertial pos="0.0626158 3.32172e-08 0.00043456" quat="0.707103 0.707103 -0.00238369 0.00238369" mass="0.191166" diaginertia="0.000155312 0.000139085 5.70486e-05"/>
+                  <joint name="6joint" pos="0 0 0" axis="1 0 0" range="-1.57 1.57" actuatorfrcrange="-3 3"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+  <contact>
+    <exclude body1="base_link" body2="1_Link"/>
+  </contact>
+     <actuator>
+    <!-- 旋转关节：力矩控制 -->
+    <motor name="act_1" joint="1joint" gear="1" ctrllimited="true" ctrlrange="-9 9"/>
+    <motor name="act_2" joint="2joint" gear="1" ctrllimited="true" ctrlrange="-9 9"/>
+    <motor name="act_3" joint="3joint" gear="1" ctrllimited="true" ctrlrange="-9 9"/>
+    <motor name="act_4" joint="4joint" gear="1" ctrllimited="true" ctrlrange="-3 3"/>
+    <motor name="act_5" joint="5joint" gear="1" ctrllimited="true" ctrlrange="-3 3"/>
+    <motor name="act_6" joint="6joint" gear="1" ctrllimited="true" ctrlrange="-3 3"/>
+  </actuator>
+</mujoco>
