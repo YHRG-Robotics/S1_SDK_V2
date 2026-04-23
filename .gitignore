@@ -22,3 +22,4 @@ eggs/
 # Other
 .DS_Store
 Thumbs.db
+.marscode/deviceInfo.json
