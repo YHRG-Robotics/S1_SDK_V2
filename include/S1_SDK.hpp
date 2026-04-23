@@ -28,7 +28,6 @@ public:
     void Control_Teach_Pos(float pos);
     void  Control_Gripper(float pos, float tau);
     void Control_Mix_Gripper(float pos, float spd,float kp, float kd, float tau);
-    // uint8_t Control_MIT(std::vector<float>& pos, std::vector<float>& vel, std::vector<float>& kp, std::vector<float>& kd,std::vector<float>& tau);
     void Set_Zero_Position();
     void Set_End_Zero_Position();
 
