@@ -1,6 +1,6 @@
 
 #!/bin/bash
-# pip install -e .
+pip install -e .
 set -e
 
 get_arch=$(uname -m)
