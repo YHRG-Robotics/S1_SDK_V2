@@ -12,13 +12,13 @@ from common import create_parser, MODE_MAP
     3. 由于逆解的多解和无解特征，在某些姿态下（尤其与坐标原点较近情况下），关节可能解算到会突变的位置，使用者应远离机械臂的工作空间
 """
 # position = [0.0,0.0,0.0,0.0,0.0,0.0,0.0]
-position = [-0.018,0.0,0.219,0,0.0,0]
-deta = 0.001
+position =[0.02, 0.00, 0.22,0.0,0.0,0.0]
+deta = 0.01
 
 # 初始化机械臂
 # windows下使用COM+number ，linux下使用/dev/ttyUSB+number
 # 例子：如windows--COM20，linux-----/dev/ttyUSB0
-current_pos = [0.08,0.0,0.20,0.0,0.0,0.0]
+current_pos = [0.02, 0.00, 0.22,0.0,0.0,0.0]
 delta = 1  # 每次调整 1 度（转为弧度）
 def on_press(key):
     try:
@@ -41,13 +41,13 @@ def on_press(key):
         elif key == keyboard.Key.shift:
             position[2] -= deta
         elif key == keyboard.Key.up:
-            position[0] -= deta
-        elif key == keyboard.Key.down:
             position[0] += deta
+        elif key == keyboard.Key.down:
+            position[0] -= deta
         elif key == keyboard.Key.left:
-            position[1] -= deta
-        elif key == keyboard.Key.right:
             position[1] += deta
+        elif key == keyboard.Key.right:
+            position[1] -= deta
         # elif key == keyboard.Key.ctrl_1:11233
             # return False  # 停止监听
         # print(f'按下了特殊键: {key}')
@@ -70,7 +70,7 @@ def main():
     arm.enable()
     try:
         pos = [0.0] *6
-        tar_pos = [-0.00, 0.27, 0.54,0.27, -0.00, -0.00]
+        tar_pos = [0.00, 0.19, 0.38, 0.20, 0.00, -0.00]
         step = [0.0] *6
         for i in range(6):
             step[i] = tar_pos[i]/100
@@ -84,10 +84,7 @@ def main():
         while True:
             current_pos = arm.get_pos()
             pos = solver.inverse_euler(position,current_pos)
-            
             arm.joint_control_mit(pos)
-            # fk_pos = solver.forward_euler(pos)
-            # print(f"当前位置: {fk_pos[0]:.2f}, {fk_pos[1]:.2f}, {fk_pos[2]:.2f}")
             time.sleep(0.005)
     except KeyboardInterrupt:
         print("\n退出程序")

@@ -28,7 +28,7 @@ def main():
         while True:
             arm.gravity()  
             current_pos = arm.get_pos()
-            arm.joint_control(current_pos)  
+            arm.joint_control(current_pos[:6])  
             time.sleep(0.001)
 
     except KeyboardInterrupt:

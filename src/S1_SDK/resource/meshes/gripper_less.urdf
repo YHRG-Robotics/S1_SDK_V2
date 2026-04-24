@@ -211,10 +211,10 @@
     <child
       link="3_Link" />
     <axis
-      xyz="0 1 0" />
+      xyz="0 -1 0" />
     <limit
-      lower="-3.4"
-      upper="0"
+      lower="0"
+      upper="3.14"
       effort="9"
       velocity="3" />
   </joint>
@@ -327,25 +327,41 @@
     <child
       link="5_Link" />
     <axis
-      xyz="0 0 1" />
+      xyz="0 0 -1" />
     <limit
       lower="-1.57"
       upper="1.57"
       effort="3"
       velocity="3" />
   </joint>
-  <link name="dummy_link">
-  <inertial>
-    <mass value="0.001"/>
-    <origin xyz="0.02 0 0" />
-    <inertia ixx="0.0000001" ixy="0" ixz="0" iyy="0.0000001" iyz="0" izz="0.0000001"/>
-  </inertial>
+  
+<link name="dummy_link">
+<inertial>
+  <mass value="0.001" />
+  <origin xyz="0.02 0 0" />
+  <inertia ixx="0.0000001" ixy="0" ixz="0" iyy="0.0000001" iyz="0" izz="0.0000001" />
+</inertial>
+<visual>
+  <origin xyz="0 0 0" rpy="0 1.57 0" />
+  <geometry>
+    <mesh filename="package://S1_urdf/meshes/flange.STL" />
+  </geometry>
+  <material name="">
+    <color rgba="1 1 1 1" />
+  </material>
+</visual>
+<collision>
+  <origin xyz="0 0 0" rpy="0 1.57 0" />
+  <geometry>
+    <mesh filename="package://S1_urdf/meshes/flange.STL" />
+  </geometry>
+</collision>
 </link>
   <joint
     name="6joint"
     type="revolute">
     <origin
-      xyz="0.0012127 0 -0.059174"
+      xyz="0.0312127 0 -0.059174"
       rpy="0 0 0" />
     <parent
       link="5_Link" />
