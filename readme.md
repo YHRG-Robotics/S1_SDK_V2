@@ -171,13 +171,13 @@ python gravity.py --dev /dev/ttyUSB0 --end None
 记录轨迹（拖动机械臂）：
 
 ```bash
-python teaching.py --dev /dev/ttyUSB0 --record True
+python3 teaching.py --dev /dev/ttyUSB0 --end gripper --record True
 ```
 
 回放轨迹：
 
 ```bash
-python teaching.py --record False
+python3 teaching.py --dev /dev/ttyUSB0 --end gripper --record False
 ```
 
 ### 运行全部示例
@@ -197,7 +197,9 @@ python keyboard_end_effect.py --dev /dev/ttyUSB0 # 键盘控制末端
 python gravity.py --dev /dev/ttyUSB0             # 重力补偿
 
 # 高级功能
-python teaching.py --dev /dev/ttyUSB0            # 示教
+python3 teaching.py --dev /dev/ttyUSB0 --end gripper --record True     # 示教记录轨迹
+python3 teaching.py --dev /dev/ttyUSB0 --end gripper --record False    # 示教回放轨迹
+
 python collision.py --dev /dev/ttyUSB0           # 碰撞检测
 python teleop_demo.py --master_dev /dev/ttyUSB0 --slaver_dev /dev/ttyUSB1  # 遥操作
 ```
