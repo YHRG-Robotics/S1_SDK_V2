@@ -121,6 +121,10 @@ class S1_arm:
         return self.strategy.joint_control(self, pos[:6])       
     def control_gripper(self,pos,force):
         return self.motor.control_gripper(pos,force)
+    def control_gripper_pos_vel(self,pos,vel):
+        return self.motor.control_gripper_pos_vel(pos,vel)
+    def control_gripper_mit(self,pos,vel,kp,kd,tau):
+        return self.motor.control_gripper_mit(pos,vel,kp,kd,tau)
     def control_teach(self,tau):
         """
         示教控制,控制六个关节

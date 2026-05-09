@@ -30,6 +30,8 @@ PYBIND11_MODULE(motor_interface, m) {
         .def("control_teach", &S1::S1ARM::Control_Teach)
         .def("control_teach_pos", &S1::S1ARM::Control_Teach_Pos)
         .def("control_gripper", &S1::S1ARM::Control_Gripper)
+        .def("control_gripper_pos_vel", &S1::S1ARM::Control_Gripper_Pos_Vel)
+        .def("control_gripper_mit", &S1::S1ARM::Control_Gripper_Mit)
         .def("control_mix_gripper", &S1::S1ARM::Control_Mix_Gripper)
         .def("set_zero_position", &S1::S1ARM::Set_Zero_Position)
         .def("set_end_zero_position", &S1::S1ARM::Set_End_Zero_Position)
