@@ -14,22 +14,26 @@ def main():
     print("=== S1 主从臂 Teleoperation Demo ===")
     args = parser.parse_args()
     # 主臂，注意 dev 的设备接口
-    master = S1_arm(control_mode.only_real, dev=args.master_dev, end_effector="teach")
+    master = S1_arm(control_mode.only_real, dev=args.master_dev, end_effector="teach",check_collision=False)
     master.enable()
     # 从臂，注意 dev 的设备接口
-    slave = S1_arm(control_mode.only_real, dev=args.slaver_dev, end_effector="gripper")
+    slave = S1_arm(control_mode.only_real, dev=args.slaver_dev, end_effector="gripper",check_collision=False)
     slave.enable()
     print("[INFO] Teleop Started (CTRL + C to stop)")
-
+    # test_arm = S1_arm(control_mode.only_sim, dev=args.master_dev, end_effector="teach",check_collision=False)
     try:
         while True:
             master_pos = master.get_pos()
             # print("master_pos",master_pos)
+            # slave_pos = slave.get_pos()
+            # print("slave_pos",slave_pos)
+            # test_arm.joint_control_mit(slave_pos[:6])
+
             master.control_teach(0.08)
             master.gravity()
             slave.joint_control_mit(master_pos[:6])
             slave.control_gripper(master_pos[-1],0.3)
-            time.sleep(0.01)  # 100Hz 循环
+            time.sleep(0.001)  # 100Hz 循环
     except KeyboardInterrupt:
         print("\n[INFO] Teleop Stopped.")
     finally:

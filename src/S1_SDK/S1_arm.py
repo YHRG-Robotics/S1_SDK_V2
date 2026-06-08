@@ -201,7 +201,7 @@ class S1_arm:
         :return: 关节位置列表,每个元素为一个关节的位置
         """
         if self.strategy.needs_motor():
-            return self.motor.get_position()
+            return self.motor.get_position().copy()
         elif self.strategy.needs_sim():
             return self.sim.get_pos()
     def get_vel(self):
@@ -210,7 +210,7 @@ class S1_arm:
         :return: 关节速度列表,每个元素为一个关节的速度
         """
         if self.strategy.needs_motor():
-            return self.motor.get_velocity()
+            return self.motor.get_velocity().copy()
         else:
             return [0.0]*self.motors
     def get_tau(self):
@@ -219,7 +219,7 @@ class S1_arm:
         :return: 关节力矩列表,每个元素为一个关节的力矩
         """
         if self.strategy.needs_motor():
-            return self.motor.get_torque()
+            return self.motor.get_torque().copy()
         else:
             return [0.0]*6
     def get_temp(self):
@@ -228,7 +228,7 @@ class S1_arm:
         :return: 关节温度列表,每个元素为一个关节的温度
         """
         if self.strategy.needs_motor():
-            return self.motor.get_coil_temperature()
+            return self.motor.get_coil_temperature().copy()
         else:
             return [0.0]*self.motors
     #####状态块END###

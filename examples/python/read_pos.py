@@ -25,7 +25,7 @@ def main():
         while True:
             current_pos = arm.get_pos()
             print(f"pos: {[f'{p:8.3f}' for p in current_pos]}")
-            time.sleep(0.01)
+            time.sleep(0.001)
     except KeyboardInterrupt:
         arm.close()
         print("\n退出程序")
