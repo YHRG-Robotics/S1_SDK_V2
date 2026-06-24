@@ -2,7 +2,11 @@ import sys
 import os
 
 # 添加项目根目录到 Python 路径
-install_kdl = True
+install_pinocchio = True
+try:
+    import pinocchio as pin
+except ImportError:
+    install_pinocchio = False
 from S1_SDK.hardware.motor_interface import S1ARM,CommType,EndType,S1_Kinematics,search_arm
 from S1_SDK.hardware.mujoco_sim import Mujoco
 from S1_SDK.hardware.collision import CollisionChecker
@@ -12,6 +16,7 @@ import time
 import math
 from typing import Dict,List
 import S1_SDK.arm_mode as arm_mode
+import numpy as np
 
 COM_TYPE : Dict[str,CommType] = {
     "V2":CommType.uart,
@@ -52,7 +57,7 @@ def clamp(value, checker):
         value = checker[1]
     return value
 class S1_arm:
-    def __init__(self,mode:control_mode,dev:str="/dev/ttyUSB0",end_effector:str="None",check_collision:bool=True,arm_version:str="V2"):
+    def __init__(self,mode:control_mode,dev:str="/dev/ttyUSB0",end_effector:str="None",check_collision:bool=True,arm_version:str="V2",use_pinocchio:bool=False):
         """
         初始化S1_arm类
         :param mode: 控制模式, 可选值为control_mode枚举中的值
@@ -78,8 +83,21 @@ class S1_arm:
             self.motors = 7
         else:
             self.motors = 7
-        
-
+        self.S1_model = None
+        if use_pinocchio and install_pinocchio:
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            urdf_path = None
+            if self.end_effector == "None":
+                urdf_path = os.path.join(script_dir,'resource/gripper_less.urdf')
+            elif self.end_effector == "gripper":
+                urdf_path = os.path.join(script_dir,'resource/gripper.urdf')
+            elif self.end_effector == "teach":
+                urdf_path = os.path.join(script_dir,'resource/teach.urdf')
+            self.S1_model = pin.buildModelFromUrdf(urdf_path)
+            self.S1_data = self.S1_model.createData()
+            self.pin_jnt_len = len(list(self.S1_model.names)) -1
+        elif use_pinocchio and not install_pinocchio:
+            sys.exit("pinocchio未安装, 无法使用pinocchio")
     ###控制块###
     def joint_control_mit(self,pos = None):
         """
@@ -175,12 +193,17 @@ class S1_arm:
         :return: 如果return_tau为True,返回当前位置下重力补偿应输出力矩列表,否则直接控制电机
         """
         qpos = self.get_pos()
-        tau = [0.0]*6
-        tau  = self.motor.gravity(qpos[:6])
+        tau = np.zeros(6)
+        if self.S1_model is not None:
+            q_pos_pin = np.zeros(self.pin_jnt_len)
+            q_pos_pin[:6] = qpos[:6]
+            tau = pin.computeGeneralizedGravity(self.S1_model, self.S1_data, q_pos_pin)
+        else:
+            tau  = self.motor.gravity(qpos[:6])
         if return_tau:
             return tau
         self.motor.control_foc(tau[:6])
-        
+       
     #####控制块END###
 
     def check_collision(self, qpos, gripper=False):
